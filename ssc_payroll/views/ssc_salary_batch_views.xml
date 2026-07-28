@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ssc_salary_batch_list" model="ir.ui.view">
+        <field name="name">ssc.salary.batch.list</field>
+        <field name="model">ssc.salary.batch</field>
+        <field name="arch" type="xml">
+            <list string="Salary Batches">
+                <field name="name"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="payslip_count" string="Payslips"/>
+                <field name="total_salaries" sum="Total Salaries"/>
+                <field name="total_overtime" sum="Total Overtime"/>
+                <field name="total_net" sum="Total Net"/>
+                <field name="state" widget="badge"
+                       decoration-success="state in ('approved', 'paid')"
+                       decoration-info="state == 'je_created'"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ssc_salary_batch_form" model="ir.ui.view">
+        <field name="name">ssc.salary.batch.form</field>
+        <field name="model">ssc.salary.batch</field>
+        <field name="arch" type="xml">
+            <form string="Salary Batch">
+                <header>
+                    <button name="action_submit" type="object" string="Submit"
+                            class="btn-primary" invisible="state != 'created'"/>
+                    <button name="action_approve" type="object" string="Approve"
+                            class="btn-primary" invisible="state != 'submitted'"
+                            groups="ssc_payroll.group_labour_payroll_manager,ssc_payroll.group_staff_payroll_manager"/>
+                    <button name="action_compute_project_distribution" type="object"
+                            string="Recompute Project Distribution"
+                            invisible="not show_project_distribution"/>
+                    <button name="action_set_paid" type="object" string="Set Paid"
+                            invisible="state not in ('approved', 'je_created')"
+                            groups="ssc_payroll.group_labour_payroll_manager,ssc_payroll.group_staff_payroll_manager"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="created,submitted,approved,je_created,paid"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_payslips" type="object"
+                                class="oe_stat_button" icon="fa-money">
+                            <field name="payslip_count" widget="statinfo" string="Payslips"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="company_id" options="{'no_create': True}"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="batch_type"/>
+                            <field name="is_staff"/>
+                            <field name="show_project_distribution"/>
+                        </group>
+                        <group>
+                            <field name="attendance_sheet_id"/>
+                            <field name="submitted_by"/>
+                            <field name="total_salaries"/>
+                            <field name="total_overtime"/>
+                            <field name="total_net"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Projects" name="projects" invisible="not show_project_distribution">
+                            <field name="project_ids">
+                                <list>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="project_id"/>
+                                    <field name="total_days" sum="Days"/>
+                                    <field name="total_salaries" sum="Total Salaries"/>
+                                    <field name="total_overtime_reg" sum="OT Reg hrs"/>
+                                    <field name="ot_reg_amount" sum="OT Reg"/>
+                                    <field name="total_overtime_off" sum="OT Off hrs"/>
+                                    <field name="ot_off_amount" sum="OT Off"/>
+                                    <field name="total_overtime_amount" optional="hide"/>
+                                    <field name="total_amount" sum="Total Cost"/>
+                                    <field name="share" widget="progressbar"/>
+                                    <field name="allocated_days" sum="Allocated Days"
+                                           optional="show"/>
+                                    <field name="allocated_salaries" optional="hide"/>
+                                    <field name="allocated_total_amount"
+                                           sum="Allocated Cost" optional="show"/>
+                                    <field name="allocated_share" widget="progressbar"
+                                           optional="show"/>
+                                </list>
+                            </field>
+                            <div invisible="not project_ids">
+                                <h4 class="mt-4">Worked Days Only</h4>
+                                <p class="text-muted small">
+                                    Days observed on a daily attendance record.
+                                    The advanced days are not here: they have
+                                    not happened yet, so no project claims them.
+                                </p>
+                                <field name="project_chart" nolabel="1" readonly="1"/>
+                                <h4 class="mt-4">Including Advanced Days</h4>
+                                <p class="text-muted small">
+                                    The advanced days attributed to the projects
+                                    the employees were on: entirely to one
+                                    project when they spent over 60% of the
+                                    period there, otherwise spread in the same
+                                    proportions as their worked days.
+                                </p>
+                                <field name="project_chart_allocated" nolabel="1"
+                                       readonly="1"/>
+                            </div>
+                        </page>
+                        <page string="Salary Sheet" name="payslips">
+                            <field name="payslip_ids">
+                                <list decoration-success="state == 'checked'">
+                                    <field name="employee_code"/>
+                                    <field name="employee_id"/>
+                                    <field name="basic_salary"/>
+                                    <field name="gross_salary"/>
+                                    <field name="rate_per_day"/>
+                                    <field name="total_attendance"/>
+                                    <field name="overtime_reg"/>
+                                    <field name="overtime_off"/>
+                                    <field name="net_amount" sum="Net"/>
+                                    <field name="state"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ssc_salary_batch_search" model="ir.ui.view">
+        <field name="name">ssc.salary.batch.search</field>
+        <field name="model">ssc.salary.batch</field>
+        <field name="arch" type="xml">
+            <search string="Salary Batches">
+                <field name="name"/>
+                <field name="company_id"/>
+                <filter name="wps" string="WPS" domain="[('batch_type', '=', 'wps')]"/>
+                <filter name="cash" string="Cash" domain="[('batch_type', '=', 'cash')]"/>
+                <filter name="staff" string="Staff" domain="[('is_staff', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_company" string="Company" context="{'group_by': 'company_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ssc_salary_batch" model="ir.actions.act_window">
+        <field name="name">Salary Batches</field>
+        <field name="res_model">ssc.salary.batch</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_ssc_salary_batch_search"/>
+        <field name="context">{'search_default_group_company': 1}</field>
+    </record>
+
+</odoo>

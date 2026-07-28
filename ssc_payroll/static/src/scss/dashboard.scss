@@ -1,0 +1,199 @@
+.o_ssc_dashboard {
+    padding: 16px 20px 40px;
+    background: var(--ssc-bg, #f6f7fb);
+    // Fill the action area and scroll internally, otherwise the tall content
+    // (KPI cards + eight charts) is clipped with no way to reach the bottom.
+    height: 100%;
+    overflow-y: auto;
+
+    // Header + filter -------------------------------------------------------
+    .o_ssc_topbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 20px;
+
+        .o_ssc_title h1 {
+            margin: 0;
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+        .o_ssc_subtitle {
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+        .o_ssc_filter {
+            display: flex;
+            gap: 10px;
+
+            .form-select {
+                min-width: 110px;
+                font-weight: 600;
+            }
+        }
+    }
+
+    // Loading ---------------------------------------------------------------
+    .o_ssc_loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        padding: 80px 0;
+        color: #6c757d;
+    }
+
+    // KPI cards -------------------------------------------------------------
+    .o_ssc_kpis {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(225px, 1fr));
+        gap: 14px;
+        margin-bottom: 22px;
+
+        .o_ssc_kpi {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px 18px;
+            box-shadow: 0 1px 3px rgba(20, 20, 40, 0.08);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 18px rgba(20, 20, 40, 0.12);
+            }
+
+            &--wide {
+                grid-column: span 2;
+            }
+
+            &--link {
+                cursor: pointer;
+                position: relative;
+
+                &:hover {
+                    box-shadow: 0 8px 22px rgba(20, 20, 40, 0.16);
+
+                    .o_ssc_link_ico { opacity: 1; }
+                }
+                .o_ssc_link_ico {
+                    font-size: 0.7rem;
+                    margin-left: 4px;
+                    opacity: 0.4;
+                    transition: opacity 0.15s ease;
+                }
+            }
+
+            &--primary {
+                background: linear-gradient(135deg, #714b67 0%, #9b5c86 100%);
+                color: #fff;
+
+                .o_ssc_kpi_icon { background: rgba(255, 255, 255, 0.2); color: #fff; }
+                .o_ssc_kpi_label { color: rgba(255, 255, 255, 0.85); }
+            }
+
+            .o_ssc_kpi_icon {
+                flex: 0 0 auto;
+                width: 48px;
+                height: 48px;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.35rem;
+                background: #f0eef3;
+                color: #714b67;
+            }
+            .o_ssc_kpi_body { min-width: 0; }
+            .o_ssc_kpi_label {
+                font-size: 0.8rem;
+                text-transform: uppercase;
+                letter-spacing: 0.03em;
+                color: #8a8fa3;
+                font-weight: 600;
+            }
+            .o_ssc_kpi_value {
+                font-size: 1.2rem;
+                font-weight: 700;
+                line-height: 1.25;
+                white-space: nowrap;
+
+                // Numeric totals must show in full; only long names clip.
+                &--sm {
+                    font-size: 1.0rem;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+            .o_ssc_kpi_sub {
+                font-size: 0.95rem;
+                font-weight: 600;
+                color: #017e84;
+            }
+        }
+    }
+
+    // Charts ----------------------------------------------------------------
+    .o_ssc_charts {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+
+        .o_ssc_card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px 18px 18px;
+            box-shadow: 0 1px 3px rgba(20, 20, 40, 0.08);
+
+            &--full { grid-column: 1 / -1; }
+
+            h3 {
+                margin: 0 0 14px;
+                font-size: 1.05rem;
+                font-weight: 700;
+                color: #2b2b3a;
+            }
+
+            .o_ssc_canvas {
+                position: relative;
+
+                // Scroll wrapper: caps the visible height while the inner
+                // element grows tall enough to keep every bar readable.
+                &--scroll {
+                    max-height: 460px;
+                    overflow-y: auto;
+                    overflow-x: hidden;
+                }
+
+                .o_ssc_canvas_inner {
+                    position: relative;
+                    width: 100%;
+                }
+            }
+        }
+    }
+
+    @media (max-width: 900px) {
+        .o_ssc_charts { grid-template-columns: 1fr; }
+        .o_ssc_kpis .o_ssc_kpi--wide { grid-column: span 1; }
+    }
+}
+
+// Dark mode -----------------------------------------------------------------
+.o_web_client.o_dark_mode .o_ssc_dashboard,
+.o_ssc_dashboard.o_dark_mode {
+    --ssc-bg: #1c1c25;
+
+    .o_ssc_kpi,
+    .o_ssc_card {
+        background: #262631;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    }
+    .o_ssc_card h3 { color: #e6e6ef; }
+    .o_ssc_kpi .o_ssc_kpi_icon { background: #34343f; }
+    .o_ssc_kpi_value { color: #f0f0f5; }
+}

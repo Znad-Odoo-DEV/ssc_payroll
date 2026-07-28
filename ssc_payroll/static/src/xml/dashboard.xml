@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="ssc_payroll.Dashboard">
+        <div class="o_ssc_dashboard">
+
+            <!-- Header + period filter -->
+            <div class="o_ssc_topbar">
+                <div class="o_ssc_title">
+                    <h1>Payroll Analytics</h1>
+                    <span class="o_ssc_subtitle" t-if="state.data">
+                        Period: <b><t t-esc="state.month"/> <t t-esc="state.year"/></b>
+                    </span>
+                </div>
+                <div class="o_ssc_filter" t-if="state.data">
+                    <select class="form-select" t-on-change="onMonthChange">
+                        <t t-foreach="state.data.months" t-as="m" t-key="m">
+                            <option t-att-value="m" t-att-selected="m === state.month" t-esc="m"/>
+                        </t>
+                    </select>
+                    <select class="form-select" t-on-change="onYearChange">
+                        <t t-foreach="state.data.years" t-as="y" t-key="y">
+                            <option t-att-value="y" t-att-selected="y === state.year" t-esc="y"/>
+                        </t>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div t-if="state.loading" class="o_ssc_loading">
+                <div class="spinner-border text-primary" role="status"/>
+                <span>Loading dashboard…</span>
+            </div>
+
+            <t t-if="!state.loading and state.data">
+                <!-- KPI cards -->
+                <div class="o_ssc_kpis">
+                    <div class="o_ssc_kpi o_ssc_kpi--primary">
+                        <div class="o_ssc_kpi_icon"><i class="fa fa-money"/></div>
+                        <div class="o_ssc_kpi_body">
+                            <div class="o_ssc_kpi_label">Total Payroll</div>
+                            <div class="o_ssc_kpi_value" t-esc="formatMoney(state.data.kpis.total_payroll)"/>
+                        </div>
+                    </div>
+
+                    <div class="o_ssc_kpi o_ssc_kpi--link" t-on-click="openEmployees">
+                        <div class="o_ssc_kpi_icon"><i class="fa fa-users"/></div>
+                        <div class="o_ssc_kpi_body">
+                            <div class="o_ssc_kpi_label">Total Employees <i class="fa fa-external-link o_ssc_link_ico"/></div>
+                            <div class="o_ssc_kpi_value" t-esc="formatInt(state.data.kpis.total_employees)"/>
+                        </div>
+                    </div>
+
+                    <div class="o_ssc_kpi o_ssc_kpi--link" t-on-click="scrollToProjects">
+                        <div class="o_ssc_kpi_icon"><i class="fa fa-building"/></div>
+                        <div class="o_ssc_kpi_body">
+                            <div class="o_ssc_kpi_label">Total Projects <i class="fa fa-bar-chart o_ssc_link_ico"/></div>
+                            <div class="o_ssc_kpi_value" t-esc="formatInt(state.data.kpis.total_projects)"/>
+                        </div>
+                    </div>
+
+                    <div class="o_ssc_kpi o_ssc_kpi--link" t-on-click="openBatches">
+                        <div class="o_ssc_kpi_icon"><i class="fa fa-balance-scale"/></div>
+                        <div class="o_ssc_kpi_body">
+                            <div class="o_ssc_kpi_label">Average Salary <i class="fa fa-external-link o_ssc_link_ico"/></div>
+                            <div class="o_ssc_kpi_value" t-esc="formatMoney(state.data.kpis.average_salary)"/>
+                        </div>
+                    </div>
+
+                    <div class="o_ssc_kpi o_ssc_kpi--link" t-on-click="() => this.openOvertime('all')">
+                        <div class="o_ssc_kpi_icon"><i class="fa fa-clock-o"/></div>
+                        <div class="o_ssc_kpi_body">
+                            <div class="o_ssc_kpi_label">Total Overtime <i class="fa fa-list o_ssc_link_ico"/></div>
+                            <div class="o_ssc_kpi_value" t-esc="formatMoney(state.data.kpis.total_overtime)"/>
+                            <div class="o_ssc_kpi_sub">
+                                <t t-esc="formatHours(state.data.kpis.ot_total_hours)"/> ·
+                                <t t-esc="formatMoney(state.data.kpis.ot_total_amount)"/> (OT Regular + OT Off)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="o_ssc_kpi o_ssc_kpi--link" t-on-click="() => this.openOvertime('reg')">
+                        <div class="o_ssc_kpi_icon"><i class="fa fa-hourglass-half"/></div>
+                        <div class="o_ssc_kpi_body">
+                            <div class="o_ssc_kpi_label">OT Regular <i class="fa fa-list o_ssc_link_ico"/></div>
+                            <div class="o_ssc_kpi_value" t-esc="formatHours(state.data.kpis.ot_reg_hours)"/>
+                            <div class="o_ssc_kpi_sub" t-esc="formatMoney(state.data.kpis.ot_reg_amount)"/>
+                        </div>
+                    </div>
+
+                    <div class="o_ssc_kpi o_ssc_kpi--link" t-on-click="() => this.openOvertime('off')">
+                        <div class="o_ssc_kpi_icon"><i class="fa fa-hourglass-end"/></div>
+                        <div class="o_ssc_kpi_body">
+                            <div class="o_ssc_kpi_label">OT Off <i class="fa fa-list o_ssc_link_ico"/></div>
+                            <div class="o_ssc_kpi_value" t-esc="formatHours(state.data.kpis.ot_off_hours)"/>
+                            <div class="o_ssc_kpi_sub" t-esc="formatMoney(state.data.kpis.ot_off_amount)"/>
+                        </div>
+                    </div>
+
+                    <div class="o_ssc_kpi">
+                        <div class="o_ssc_kpi_icon"><i class="fa fa-calculator"/></div>
+                        <div class="o_ssc_kpi_body">
+                            <div class="o_ssc_kpi_label">Total Cost</div>
+                            <div class="o_ssc_kpi_value" t-esc="formatMoney(state.data.kpis.total_cost)"/>
+                        </div>
+                    </div>
+
+                    <div class="o_ssc_kpi o_ssc_kpi--wide">
+                        <div class="o_ssc_kpi_icon"><i class="fa fa-trophy"/></div>
+                        <div class="o_ssc_kpi_body">
+                            <div class="o_ssc_kpi_label">Highest Paid Employee</div>
+                            <div class="o_ssc_kpi_value o_ssc_kpi_value--sm" t-esc="state.data.kpis.highest_paid_employee"/>
+                            <div class="o_ssc_kpi_sub" t-esc="formatMoney(state.data.kpis.highest_paid_amount)"/>
+                        </div>
+                    </div>
+
+                    <div class="o_ssc_kpi o_ssc_kpi--wide">
+                        <div class="o_ssc_kpi_icon"><i class="fa fa-star"/></div>
+                        <div class="o_ssc_kpi_body">
+                            <div class="o_ssc_kpi_label">Highest Cost Project</div>
+                            <div class="o_ssc_kpi_value o_ssc_kpi_value--sm" t-esc="state.data.kpis.highest_cost_project"/>
+                            <div class="o_ssc_kpi_sub" t-esc="formatMoney(state.data.kpis.highest_cost_amount)"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="o_ssc_charts">
+                    <div class="o_ssc_card o_ssc_card--full">
+                        <h3>Salary Distribution by Designation</h3>
+                        <div class="o_ssc_canvas o_ssc_canvas--scroll">
+                            <div class="o_ssc_canvas_inner" t-att-style="'height:' + tallHeight('salary_by_designation') + 'px'">
+                                <canvas t-ref="salaryByDesignation"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="o_ssc_card">
+                        <h3>Salary: Labour vs Staff / Engineer</h3>
+                        <div class="o_ssc_canvas" style="height: 320px;">
+                            <canvas t-ref="salaryByCategory"/>
+                        </div>
+                    </div>
+
+                    <div class="o_ssc_card" t-ref="projectCard">
+                        <h3>Salary Distribution by Project</h3>
+                        <div class="o_ssc_canvas" style="height: 320px;">
+                            <canvas t-ref="salaryByProject"/>
+                        </div>
+                    </div>
+
+                    <div class="o_ssc_card">
+                        <h3>Overtime by Project</h3>
+                        <div class="o_ssc_canvas" style="height: 320px;">
+                            <canvas t-ref="overtimeByProject"/>
+                        </div>
+                    </div>
+
+                    <div class="o_ssc_card">
+                        <h3>Employee Count by Project</h3>
+                        <div class="o_ssc_canvas" style="height: 320px;">
+                            <canvas t-ref="employeesByProject"/>
+                        </div>
+                    </div>
+
+                    <div class="o_ssc_card o_ssc_card--full">
+                        <h3>Overtime by Employee</h3>
+                        <div class="o_ssc_canvas o_ssc_canvas--scroll">
+                            <div class="o_ssc_canvas_inner" t-att-style="'height:' + tallHeight('overtime_by_employee') + 'px'">
+                                <canvas t-ref="overtimeByEmployee"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="o_ssc_card">
+                        <h3>Top 10 Highest Salary Employees</h3>
+                        <div class="o_ssc_canvas" style="height: 340px;">
+                            <canvas t-ref="topSalaryEmployees"/>
+                        </div>
+                    </div>
+
+                    <div class="o_ssc_card">
+                        <h3>Top Projects by Payroll Cost</h3>
+                        <div class="o_ssc_canvas" style="height: 340px;">
+                            <canvas t-ref="topProjectsCost"/>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+
+</templates>

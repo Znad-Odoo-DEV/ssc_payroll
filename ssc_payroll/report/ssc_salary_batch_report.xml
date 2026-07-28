@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_ssc_salary_batch" model="ir.actions.report">
+        <field name="name">Salary Batch</field>
+        <field name="model">ssc.salary.batch</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ssc_payroll.report_ssc_salary_batch</field>
+        <field name="report_file">ssc_payroll.report_ssc_salary_batch</field>
+        <field name="binding_model_id" ref="model_ssc_salary_batch"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_ssc_salary_batch">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 t-out="doc.name"/>
+                        <div class="row mt-2">
+                            <div class="col-6">
+                                <strong>Company:</strong> <span t-field="doc.company_id"/><br/>
+                                <strong>Type:</strong> <span t-field="doc.batch_type"/>
+                                <span t-if="doc.is_staff"> (Staff)</span>
+                            </div>
+                            <div class="col-6 text-end">
+                                <strong>Total Salaries:</strong> <span t-field="doc.total_salaries"/><br/>
+                                <strong>Total Overtime:</strong> <span t-field="doc.total_overtime"/><br/>
+                                <strong>Total Net:</strong> <strong><span t-field="doc.total_net"/></strong>
+                            </div>
+                        </div>
+
+                        <h4 class="mt-4">Salary Sheet</h4>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Employee ID</th>
+                                    <th>Employee</th>
+                                    <th class="text-end">Gross</th>
+                                    <th class="text-end">Attendance</th>
+                                    <th class="text-end">OT Reg</th>
+                                    <th class="text-end">OT Off</th>
+                                    <th class="text-end">Net</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="doc.payslip_ids" t-as="slip">
+                                    <td t-field="slip.employee_code"/>
+                                    <td t-field="slip.employee_id"/>
+                                    <td class="text-end" t-field="slip.gross_salary"/>
+                                    <td class="text-end" t-field="slip.total_attendance"/>
+                                    <td class="text-end" t-field="slip.overtime_reg"/>
+                                    <td class="text-end" t-field="slip.overtime_off"/>
+                                    <td class="text-end" t-field="slip.net_amount"/>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="border-top">
+                                    <td colspan="6" class="text-end"><strong>Total Net</strong></td>
+                                    <td class="text-end"><strong><span t-field="doc.total_net"/></strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <t t-if="doc.show_project_distribution and doc.project_ids">
+                            <h4 class="mt-3">Project Distribution</h4>
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Project</th>
+                                        <th class="text-end">Days</th>
+                                        <th class="text-end">Salaries</th>
+                                        <th class="text-end">OT Regular</th>
+                                        <th class="text-end">OT Off</th>
+                                        <th class="text-end">Total Cost</th>
+                                        <th class="text-end">Share</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="doc.project_ids" t-as="p">
+                                        <td t-field="p.project_id"/>
+                                        <td class="text-end" t-field="p.total_days"/>
+                                        <td class="text-end" t-field="p.total_salaries"/>
+                                        <td class="text-end" t-field="p.ot_reg_amount"/>
+                                        <td class="text-end" t-field="p.ot_off_amount"/>
+                                        <td class="text-end" t-field="p.total_amount"/>
+                                        <td class="text-end">
+                                            <span t-esc="'%.1f%%' % p.share"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="5"><strong>Total</strong></td>
+                                        <td class="text-end">
+                                            <strong t-esc="sum(doc.project_ids.mapped('total_amount'))"
+                                                    t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                        </td>
+                                        <td class="text-end"><strong>100.0%</strong></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

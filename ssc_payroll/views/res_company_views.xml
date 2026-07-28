@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_company_form_ssc_payroll" model="ir.ui.view">
+        <field name="name">res.company.form.ssc.payroll</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <sheet position="inside">
+                <group string="Payroll Configuration" name="ssc_payroll">
+                    <field name="ssc_company_code"/>
+                    <field name="ssc_company_abbr"/>
+                    <field name="ssc_payroll_start_day"/>
+                </group>
+            </sheet>
+        </field>
+    </record>
+
+</odoo>

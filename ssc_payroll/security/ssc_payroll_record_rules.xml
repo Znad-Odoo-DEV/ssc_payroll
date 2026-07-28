@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="ssc_employee_company_rule" model="ir.rule">
+        <field name="name">SSC Employee: multi-company</field>
+        <field name="model_id" ref="model_ssc_employee"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        <field name="global" eval="True"/>
+    </record>
+
+    <record id="ssc_staff_project_company_rule" model="ir.rule">
+        <field name="name">SSC Staff Project: multi-company</field>
+        <field name="model_id" ref="model_ssc_staff_project"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        <field name="global" eval="True"/>
+    </record>
+
+    <record id="ssc_public_holiday_company_rule" model="ir.rule">
+        <field name="name">SSC Public Holiday: multi-company</field>
+        <field name="model_id" ref="model_ssc_public_holiday"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        <field name="global" eval="True"/>
+    </record>
+
+    <record id="ssc_attendance_sheet_company_rule" model="ir.rule">
+        <field name="name">SSC Attendance Sheet: multi-company</field>
+        <field name="model_id" ref="model_ssc_attendance_sheet"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        <field name="global" eval="True"/>
+    </record>
+
+    <!-- Labour Attendance Officers may delete attendance sheets only while they
+         are still New (this rule applies to unlink only; read is unrestricted
+         through the global company rule above). Managers are not covered by
+         this rule, so they can delete in any state. -->
+    <record id="ssc_attendance_sheet_officer_unlink_rule" model="ir.rule">
+        <field name="name">SSC Attendance Sheet: officer deletes only New</field>
+        <field name="model_id" ref="model_ssc_attendance_sheet"/>
+        <field name="groups" eval="[(4, ref('group_labour_attendance'))]"/>
+        <field name="domain_force">[('state', '=', 'new')]</field>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- Managers delete in any state. Record rules are OR-ed across a user's
+         groups, so this permissive unlink rule lets anyone who is ALSO a
+         Manager (including admins, who imply the Manager group) delete beyond
+         New - otherwise the officer rule above would restrict them too. -->
+    <record id="ssc_attendance_sheet_manager_unlink_rule" model="ir.rule">
+        <field name="name">SSC Attendance Sheet: manager deletes any</field>
+        <field name="model_id" ref="model_ssc_attendance_sheet"/>
+        <field name="groups" eval="[(4, ref('group_labour_attendance_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="ssc_staff_attendance_company_rule" model="ir.rule">
+        <field name="name">SSC Staff Attendance: multi-company</field>
+        <field name="model_id" ref="model_ssc_staff_attendance"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        <field name="global" eval="True"/>
+    </record>
+
+    <record id="ssc_attachment_company_rule" model="ir.rule">
+        <field name="name">SSC Attachment: multi-company</field>
+        <field name="model_id" ref="model_ssc_attachment"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        <field name="global" eval="True"/>
+    </record>
+
+    <record id="ssc_payslip_company_rule" model="ir.rule">
+        <field name="name">SSC Payslip: multi-company</field>
+        <field name="model_id" ref="model_ssc_payslip"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        <field name="global" eval="True"/>
+    </record>
+
+    <record id="ssc_salary_batch_company_rule" model="ir.rule">
+        <field name="name">SSC Salary Batch: multi-company</field>
+        <field name="model_id" ref="model_ssc_salary_batch"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        <field name="global" eval="True"/>
+    </record>
+
+    <record id="ssc_advance_company_rule" model="ir.rule">
+        <field name="name">SSC Advance: multi-company</field>
+        <field name="model_id" ref="model_ssc_advance"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        <field name="global" eval="True"/>
+    </record>
+
+    <record id="ssc_staff_loan_company_rule" model="ir.rule">
+        <field name="name">SSC Staff Loan: multi-company</field>
+        <field name="model_id" ref="model_ssc_staff_loan"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        <field name="global" eval="True"/>
+    </record>
+
+    <record id="ssc_leave_expense_company_rule" model="ir.rule">
+        <field name="name">SSC Leave Expense: multi-company</field>
+        <field name="model_id" ref="model_ssc_leave_expense"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        <field name="global" eval="True"/>
+    </record>
+
+    <record id="ssc_fine_company_rule" model="ir.rule">
+        <field name="name">SSC Fine: multi-company</field>
+        <field name="model_id" ref="model_ssc_fine"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        <field name="global" eval="True"/>
+    </record>
+
+    <record id="ssc_eos_company_rule" model="ir.rule">
+        <field name="name">SSC End of Service: multi-company</field>
+        <field name="model_id" ref="model_ssc_end_of_service"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        <field name="global" eval="True"/>
+    </record>
+
+    <record id="ssc_on_hold_company_rule" model="ir.rule">
+        <field name="name">SSC On-Hold: multi-company</field>
+        <field name="model_id" ref="model_ssc_on_hold"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        <field name="global" eval="True"/>
+    </record>
+
+    <!-- ==================================================================
+         Labour vs staff separation. GROUP rules (not global), so they are
+         OR-ed: each side's Officer and Manager both carry the same filter,
+         and nobody is in both sides, so each user sees only their workforce.
+         Staff = Engineer/Office employees (is_engineer_office); everyone else
+         counts as labour.
+         ================================================================== -->
+
+    <record id="ssc_payslip_labour_rule" model="ir.rule">
+        <field name="name">SSC Payslip: labour only</field>
+        <field name="model_id" ref="model_ssc_payslip"/>
+        <field name="groups" eval="[(4, ref('group_labour_payroll')), (4, ref('group_labour_payroll_manager'))]"/>
+        <field name="domain_force">[('employee_id.is_engineer_office', '=', False)]</field>
+    </record>
+    <record id="ssc_payslip_staff_rule" model="ir.rule">
+        <field name="name">SSC Payslip: staff only</field>
+        <field name="model_id" ref="model_ssc_payslip"/>
+        <field name="groups" eval="[(4, ref('group_staff_payroll')), (4, ref('group_staff_payroll_manager'))]"/>
+        <field name="domain_force">[('employee_id.is_engineer_office', '=', True)]</field>
+    </record>
+
+    <record id="ssc_batch_labour_rule" model="ir.rule">
+        <field name="name">SSC Salary Batch: labour only</field>
+        <field name="model_id" ref="model_ssc_salary_batch"/>
+        <field name="groups" eval="[(4, ref('group_labour_payroll')), (4, ref('group_labour_payroll_manager'))]"/>
+        <field name="domain_force">[('is_staff', '=', False)]</field>
+    </record>
+    <record id="ssc_batch_staff_rule" model="ir.rule">
+        <field name="name">SSC Salary Batch: staff only</field>
+        <field name="model_id" ref="model_ssc_salary_batch"/>
+        <field name="groups" eval="[(4, ref('group_staff_payroll')), (4, ref('group_staff_payroll_manager'))]"/>
+        <field name="domain_force">[('is_staff', '=', True)]</field>
+    </record>
+
+    <record id="ssc_advance_labour_rule" model="ir.rule">
+        <field name="name">SSC Advance: labour only</field>
+        <field name="model_id" ref="model_ssc_advance"/>
+        <field name="groups" eval="[(4, ref('group_labour_payroll')), (4, ref('group_labour_payroll_manager'))]"/>
+        <field name="domain_force">[('employee_id.is_engineer_office', '=', False)]</field>
+    </record>
+    <record id="ssc_advance_staff_rule" model="ir.rule">
+        <field name="name">SSC Advance: staff only</field>
+        <field name="model_id" ref="model_ssc_advance"/>
+        <field name="groups" eval="[(4, ref('group_staff_payroll')), (4, ref('group_staff_payroll_manager'))]"/>
+        <field name="domain_force">[('employee_id.is_engineer_office', '=', True)]</field>
+    </record>
+
+    <record id="ssc_staff_loan_labour_rule" model="ir.rule">
+        <field name="name">SSC Staff Loan: labour only</field>
+        <field name="model_id" ref="model_ssc_staff_loan"/>
+        <field name="groups" eval="[(4, ref('group_labour_payroll')), (4, ref('group_labour_payroll_manager'))]"/>
+        <field name="domain_force">[('employee_id.is_engineer_office', '=', False)]</field>
+    </record>
+    <record id="ssc_staff_loan_staff_rule" model="ir.rule">
+        <field name="name">SSC Staff Loan: staff only</field>
+        <field name="model_id" ref="model_ssc_staff_loan"/>
+        <field name="groups" eval="[(4, ref('group_staff_payroll')), (4, ref('group_staff_payroll_manager'))]"/>
+        <field name="domain_force">[('employee_id.is_engineer_office', '=', True)]</field>
+    </record>
+
+    <record id="ssc_leave_expense_labour_rule" model="ir.rule">
+        <field name="name">SSC Leave Expense: labour only</field>
+        <field name="model_id" ref="model_ssc_leave_expense"/>
+        <field name="groups" eval="[(4, ref('group_labour_payroll')), (4, ref('group_labour_payroll_manager'))]"/>
+        <field name="domain_force">[('employee_id.is_engineer_office', '=', False)]</field>
+    </record>
+    <record id="ssc_leave_expense_staff_rule" model="ir.rule">
+        <field name="name">SSC Leave Expense: staff only</field>
+        <field name="model_id" ref="model_ssc_leave_expense"/>
+        <field name="groups" eval="[(4, ref('group_staff_payroll')), (4, ref('group_staff_payroll_manager'))]"/>
+        <field name="domain_force">[('employee_id.is_engineer_office', '=', True)]</field>
+    </record>
+
+    <record id="ssc_fine_labour_rule" model="ir.rule">
+        <field name="name">SSC Fine: labour only</field>
+        <field name="model_id" ref="model_ssc_fine"/>
+        <field name="groups" eval="[(4, ref('group_labour_payroll')), (4, ref('group_labour_payroll_manager'))]"/>
+        <field name="domain_force">[('employee_id.is_engineer_office', '=', False)]</field>
+    </record>
+    <record id="ssc_fine_staff_rule" model="ir.rule">
+        <field name="name">SSC Fine: staff only</field>
+        <field name="model_id" ref="model_ssc_fine"/>
+        <field name="groups" eval="[(4, ref('group_staff_payroll')), (4, ref('group_staff_payroll_manager'))]"/>
+        <field name="domain_force">[('employee_id.is_engineer_office', '=', True)]</field>
+    </record>
+
+    <record id="ssc_eos_labour_rule" model="ir.rule">
+        <field name="name">SSC End of Service: labour only</field>
+        <field name="model_id" ref="model_ssc_end_of_service"/>
+        <field name="groups" eval="[(4, ref('group_labour_payroll')), (4, ref('group_labour_payroll_manager'))]"/>
+        <field name="domain_force">[('employee_id.is_engineer_office', '=', False)]</field>
+    </record>
+    <record id="ssc_eos_staff_rule" model="ir.rule">
+        <field name="name">SSC End of Service: staff only</field>
+        <field name="model_id" ref="model_ssc_end_of_service"/>
+        <field name="groups" eval="[(4, ref('group_staff_payroll')), (4, ref('group_staff_payroll_manager'))]"/>
+        <field name="domain_force">[('employee_id.is_engineer_office', '=', True)]</field>
+    </record>
+
+    <record id="ssc_on_hold_labour_rule" model="ir.rule">
+        <field name="name">SSC On-Hold: labour only</field>
+        <field name="model_id" ref="model_ssc_on_hold"/>
+        <field name="groups" eval="[(4, ref('group_labour_payroll')), (4, ref('group_labour_payroll_manager'))]"/>
+        <field name="domain_force">[('employee_id.is_engineer_office', '=', False)]</field>
+    </record>
+    <record id="ssc_on_hold_staff_rule" model="ir.rule">
+        <field name="name">SSC On-Hold: staff only</field>
+        <field name="model_id" ref="model_ssc_on_hold"/>
+        <field name="groups" eval="[(4, ref('group_staff_payroll')), (4, ref('group_staff_payroll_manager'))]"/>
+        <field name="domain_force">[('employee_id.is_engineer_office', '=', True)]</field>
+    </record>
+
+</odoo>

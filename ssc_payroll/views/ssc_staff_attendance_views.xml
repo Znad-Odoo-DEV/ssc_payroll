@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ssc_staff_attendance_list" model="ir.ui.view">
+        <field name="name">ssc.staff.attendance.list</field>
+        <field name="model">ssc.staff.attendance</field>
+        <field name="arch" type="xml">
+            <list string="Staff Attendance">
+                <field name="name"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="month"/>
+                <field name="year"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'submitted'"
+                       decoration-info="state == 'generated'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ssc_staff_attendance_form" model="ir.ui.view">
+        <field name="name">ssc.staff.attendance.form</field>
+        <field name="model">ssc.staff.attendance</field>
+        <field name="arch" type="xml">
+            <form string="Staff Attendance">
+                <header>
+                    <button name="action_generate" type="object" string="Generate"
+                            class="btn-primary" invisible="state not in ('created', 'generated')"/>
+                    <button name="action_submit" type="object" string="Submit"
+                            class="btn-primary" invisible="state != 'generated'"/>
+                    <button name="action_approve" type="object" string="Approve"
+                            class="btn-success" invisible="state != 'submitted'"/>
+                    <button name="action_generate_payslips" type="object"
+                            string="Generate Payslips" class="btn-primary"
+                            invisible="state != 'approved'"/>
+                    <button name="action_reset" type="object" string="Reset"
+                            invisible="state == 'created'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="created,generated,submitted,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_payslips" type="object"
+                                class="oe_stat_button" icon="fa-money"
+                                invisible="payslip_count == 0">
+                            <field name="payslip_count" widget="statinfo" string="Payslips"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="company_id" options="{'no_create': True}"
+                                   readonly="state != 'created'"/>
+                        </group>
+                        <group>
+                            <field name="month" readonly="state != 'created'"/>
+                            <field name="year" readonly="state != 'created'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Employees" name="employees">
+                            <field name="line_ids">
+                                <list string="Staff"
+                                      decoration-warning="advance_state == 'pending'"
+                                      decoration-muted="advance_state == 'rejected'">
+                                    <field name="employee_code"/>
+                                    <field name="employee_id"/>
+                                    <field name="job_position"/>
+                                    <field name="gross_salary"/>
+                                    <field name="attended_days"/>
+                                    <field name="advance_days"/>
+                                    <field name="advance_state" widget="badge"
+                                           decoration-warning="advance_state == 'pending'"
+                                           decoration-success="advance_state == 'approved'"
+                                           decoration-danger="advance_state == 'rejected'"/>
+                                    <button name="action_approve_advance" type="object"
+                                            string="Approve" icon="fa-check text-success"
+                                            title="Grant the advance days"
+                                            invisible="advance_state == 'approved'"/>
+                                    <button name="action_reject_advance" type="object"
+                                            string="Reject" icon="fa-times text-danger"
+                                            title="Withhold the advance days"
+                                            invisible="advance_state == 'rejected'"/>
+                                    <field name="total_attended_days"/>
+                                    <field name="total_absence_days"/>
+                                    <field name="last_month_absence" optional="show"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                                <form string="Staff Attendance">
+                                    <group>
+                                        <group string="Employee">
+                                            <field name="employee_id"/>
+                                            <field name="employee_code"/>
+                                            <field name="job_position"/>
+                                            <field name="currency_id" invisible="1"/>
+                                        </group>
+                                        <group string="Attendance">
+                                            <field name="attended_days"/>
+                                            <field name="total_absence_days"/>
+                                            <field name="last_month_absence"/>
+                                            <label for="advance_days"/>
+                                            <div class="o_row">
+                                                <field name="advance_days"/>
+                                                <field name="advance_state" widget="badge"
+                                                       decoration-warning="advance_state == 'pending'"
+                                                       decoration-success="advance_state == 'approved'"
+                                                       decoration-danger="advance_state == 'rejected'"/>
+                                                <button name="action_approve_advance" type="object"
+                                                        string="Approve" class="btn-link text-success"
+                                                        invisible="advance_state == 'approved'"/>
+                                                <button name="action_reject_advance" type="object"
+                                                        string="Reject" class="btn-link text-danger"
+                                                        invisible="advance_state == 'rejected'"/>
+                                            </div>
+                                            <field name="total_attended_days"/>
+                                        </group>
+                                    </group>
+                                    <group string="Salary">
+                                        <group>
+                                            <field name="basic_salary"/>
+                                            <field name="house_allowance"/>
+                                            <field name="transport_allowance"/>
+                                        </group>
+                                        <group>
+                                            <field name="other_allowance"/>
+                                            <field name="gross_salary"/>
+                                        </group>
+                                    </group>
+                                    <separator string="Daily Attendance"/>
+                                    <field name="day_ids" readonly="1">
+                                        <list string="Daily Attendance"
+                                              decoration-muted="is_off_day"
+                                              default_order="date">
+                                            <field name="date"/>
+                                            <field name="day_name"/>
+                                            <field name="check_in" widget="datetime"/>
+                                            <field name="check_out" widget="datetime"/>
+                                            <field name="project_id"/>
+                                            <field name="is_off_day" string="Off"/>
+                                        </list>
+                                    </field>
+                                    <separator string="Projects Distribution"/>
+                                    <field name="distribution_ids">
+                                        <list editable="bottom">
+                                            <field name="project_id"/>
+                                            <field name="percentage"/>
+                                        </list>
+                                    </field>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ssc_staff_attendance" model="ir.actions.act_window">
+        <field name="name">Staff Attendance</field>
+        <field name="res_model">ssc.staff.attendance</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Period picker shown when Generate is pressed. -->
+    <record id="view_ssc_staff_attendance_generate_wizard" model="ir.ui.view">
+        <field name="name">ssc.staff.attendance.generate.wizard.form</field>
+        <field name="model">ssc.staff.attendance.generate.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Select Attendance Period">
+                <field name="staff_attendance_id" invisible="1"/>
+                <p>Choose the periods to pull the daily attendance from. Both are
+                   pre-filled from the month and can be adjusted.</p>
+                <group>
+                    <group string="Current Period">
+                        <field name="start_date"/>
+                        <field name="last_date"/>
+                    </group>
+                    <group string="Last Month (absence settled as deduction)">
+                        <field name="last_month_start" required="1"/>
+                        <field name="last_month_end" required="1"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_generate" type="object" string="Generate"
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

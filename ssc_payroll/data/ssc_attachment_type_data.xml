@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="attachment_type_salary_addition" model="ssc.attachment.type">
+        <field name="name">Salary Addition</field>
+        <field name="kind">addition</field>
+    </record>
+
+    <record id="attachment_type_salary_deduction" model="ssc.attachment.type">
+        <field name="name">Salary Deductions</field>
+        <field name="kind">deduction</field>
+    </record>
+
+    <record id="attachment_type_phone_bill" model="ssc.attachment.type">
+        <field name="name">Phone Bill Reimbursement</field>
+        <field name="kind">addition</field>
+    </record>
+
+    <record id="attachment_type_sick_leave" model="ssc.attachment.type">
+        <field name="name">Sick Leave Reimbursement</field>
+        <field name="kind">addition</field>
+    </record>
+
+    <record id="attachment_type_medical_bill" model="ssc.attachment.type">
+        <field name="name">Medical Bill Reimbursement</field>
+        <field name="kind">addition</field>
+    </record>
+
+    <record id="attachment_type_advance_deduction" model="ssc.attachment.type">
+        <field name="name">Salary Advance-Deduction</field>
+        <field name="kind">deduction</field>
+    </record>
+
+</odoo>

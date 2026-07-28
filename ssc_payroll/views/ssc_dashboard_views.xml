@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ssc_payroll_dashboard_form" model="ir.ui.view">
+        <field name="name">ssc.payroll.dashboard.form</field>
+        <field name="model">ssc.payroll.dashboard</field>
+        <field name="arch" type="xml">
+            <form string="Payroll Dashboard" create="false" edit="false">
+                <sheet>
+                    <field name="currency_id" invisible="1"/>
+                    <div class="oe_title">
+                        <h1>Payroll Dashboard</h1>
+                        <h3 class="text-muted"><field name="period_label" readonly="1"/></h3>
+                    </div>
+                    <group>
+                        <group string="This Month">
+                            <field name="total_net_month"/>
+                            <field name="total_ot_month"/>
+                        </group>
+                        <group string="Headcount">
+                            <field name="employee_count"/>
+                            <field name="staff_count"/>
+                            <field name="labour_count"/>
+                        </group>
+                        <group string="Outstanding Balances">
+                            <field name="outstanding_advances"/>
+                            <field name="outstanding_loans"/>
+                            <field name="outstanding_fines"/>
+                        </group>
+                        <group string="Pending Actions">
+                            <field name="batches_pending"/>
+                            <field name="payslips_new"/>
+                        </group>
+                    </group>
+                    <separator string="Quick Actions"/>
+                    <div class="o_row">
+                        <button name="action_open_employees" type="object" class="btn btn-secondary me-2"
+                                string="Employees" icon="fa-users"/>
+                        <button name="action_open_payslips" type="object" class="btn btn-secondary me-2"
+                                string="Payslips" icon="fa-money"/>
+                        <button name="action_open_payslips_new" type="object" class="btn btn-secondary me-2"
+                                string="Payslips to Process" icon="fa-hourglass-half"/>
+                        <button name="action_open_batches" type="object" class="btn btn-secondary me-2"
+                                string="Salary Batches" icon="fa-cubes"/>
+                        <button name="action_open_batches_pending" type="object" class="btn btn-secondary me-2"
+                                string="Batches to Approve" icon="fa-check-square-o"/>
+                        <button name="action_open_advances" type="object" class="btn btn-secondary me-2"
+                                string="Advances" icon="fa-credit-card"/>
+                        <button name="action_open_loans" type="object" class="btn btn-secondary me-2"
+                                string="Loans" icon="fa-handshake-o"/>
+                        <button name="action_open_fines" type="object" class="btn btn-secondary me-2"
+                                string="Fines" icon="fa-gavel"/>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Legacy form-based dashboard, kept intact for backward compatibility. -->
+    <record id="action_ssc_payroll_dashboard" model="ir.actions.act_window">
+        <field name="name">Payroll Dashboard (Classic)</field>
+        <field name="res_model">ssc.payroll.dashboard</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+
+    <!-- New interactive OWL analytics dashboard. The menu that opens it lives
+         in ssc_payroll_menus.xml, which loads after the root menu it parents
+         to (this file loads before that root exists on a fresh install). -->
+    <record id="action_ssc_payroll_dashboard_owl" model="ir.actions.client">
+        <field name="name">Payroll Dashboard</field>
+        <field name="tag">ssc_payroll_dashboard</field>
+    </record>
+
+</odoo>

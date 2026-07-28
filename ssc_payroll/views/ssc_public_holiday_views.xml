@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ssc_public_holiday_list" model="ir.ui.view">
+        <field name="name">ssc.public.holiday.list</field>
+        <field name="model">ssc.public.holiday</field>
+        <field name="arch" type="xml">
+            <list string="Public Holidays" editable="bottom">
+                <field name="date"/>
+                <field name="name"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="note"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_ssc_public_holiday" model="ir.actions.act_window">
+        <field name="name">Public Holidays</field>
+        <field name="res_model">ssc.public.holiday</field>
+        <field name="view_mode">list</field>
+    </record>
+
+</odoo>

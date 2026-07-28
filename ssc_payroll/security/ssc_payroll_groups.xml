@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="module_category_ssc_payroll" model="ir.module.category">
+        <field name="name">SSC Payroll</field>
+        <field name="description">Access rights for the SSC Payroll module.</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <!-- Eight fully independent groups: one Officer and one Manager per
+         functional area. NOTHING implies anything else - every group carries
+         its own model access outright (see ir.model.access.csv) and the
+         labour/staff separation is done with record rules, not inheritance.
+         Officer = read/write/create (no delete, no configuration).
+         Manager = full rights, delete and configuration for its own area. -->
+
+    <!-- Labour Attendance -->
+    <record id="group_labour_attendance" model="res.groups">
+        <field name="name">Labour Attendance: Officer</field>
+        <field name="category_id" ref="module_category_ssc_payroll"/>
+        <field name="comment">Fill in the monthly labour attendance sheets.</field>
+    </record>
+    <record id="group_labour_attendance_manager" model="res.groups">
+        <field name="name">Labour Attendance: Manager</field>
+        <field name="category_id" ref="module_category_ssc_payroll"/>
+        <field name="comment">Manage and delete labour attendance sheets; configure public holidays.</field>
+    </record>
+
+    <!-- Staff Attendance -->
+    <record id="group_staff_attendance" model="res.groups">
+        <field name="name">Staff Attendance: Officer</field>
+        <field name="category_id" ref="module_category_ssc_payroll"/>
+        <field name="comment">Fill in the monthly staff attendance and project distribution.</field>
+    </record>
+    <record id="group_staff_attendance_manager" model="res.groups">
+        <field name="name">Staff Attendance: Manager</field>
+        <field name="category_id" ref="module_category_ssc_payroll"/>
+        <field name="comment">Manage and delete staff attendance; manage projects and public holidays.</field>
+    </record>
+
+    <!-- Labour Payroll (payslips, batches, attachments and expenses) -->
+    <record id="group_labour_payroll" model="res.groups">
+        <field name="name">Labour Payroll: Officer</field>
+        <field name="category_id" ref="module_category_ssc_payroll"/>
+        <field name="comment">Labour payslips, batches, attachments and expenses (non-staff).</field>
+    </record>
+    <record id="group_labour_payroll_manager" model="res.groups">
+        <field name="name">Labour Payroll: Manager</field>
+        <field name="category_id" ref="module_category_ssc_payroll"/>
+        <field name="comment">Full labour payroll rights: approve, delete and configure attachment types.</field>
+    </record>
+
+    <!-- Staff Payroll (payslips, batches, attachments and expenses) -->
+    <record id="group_staff_payroll" model="res.groups">
+        <field name="name">Staff Payroll: Officer</field>
+        <field name="category_id" ref="module_category_ssc_payroll"/>
+        <field name="comment">Staff payslips, batches, attachments and expenses (engineer/office).</field>
+    </record>
+    <record id="group_staff_payroll_manager" model="res.groups">
+        <field name="name">Staff Payroll: Manager</field>
+        <field name="category_id" ref="module_category_ssc_payroll"/>
+        <field name="comment">Full staff payroll rights: approve, delete and configure attachment types.</field>
+    </record>
+
+    <!-- System administrators get every Manager group, so they keep full
+         payroll access. This is the standard admin convenience, not
+         inter-area inheritance. -->
+    <record id="base.group_system" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('group_labour_attendance_manager')), (4, ref('group_staff_attendance_manager')), (4, ref('group_labour_payroll_manager')), (4, ref('group_staff_payroll_manager'))]"/>
+    </record>
+
+</odoo>

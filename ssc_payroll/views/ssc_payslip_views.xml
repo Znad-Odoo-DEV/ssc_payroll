@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Overtime drill-down: one row per (employee, project), grouped by
+         employee. Opened from the dashboard overtime KPI cards. -->
+    <record id="view_ssc_payslip_project_ot_list" model="ir.ui.view">
+        <field name="name">ssc.payslip.project.overtime.list</field>
+        <field name="model">ssc.payslip.project</field>
+        <field name="arch" type="xml">
+            <list string="Overtime by Employee &amp; Project" create="false" default_order="employee_id">
+                <field name="currency_id" column_invisible="1"/>
+                <field name="employee_id"/>
+                <field name="project_id"/>
+                <field name="total_overtime_reg" sum="OT Regular (h)"/>
+                <field name="total_overtime_off" sum="OT Off (h)"/>
+                <field name="total_overtime" sum="Total OT (h)"/>
+                <field name="ot_reg_amount" sum="OT Regular"/>
+                <field name="ot_off_amount" sum="OT Off"/>
+                <field name="total_overtime_amount" sum="Total Overtime"/>
+                <field name="month" optional="hide"/>
+                <field name="year" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_ssc_overtime_report" model="ir.actions.act_window">
+        <field name="name">Overtime Details</field>
+        <field name="res_model">ssc.payslip.project</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_ssc_payslip_project_ot_list"/>
+        <field name="context">{'group_by': ['employee_id']}</field>
+    </record>
+
+    <record id="view_ssc_payslip_list" model="ir.ui.view">
+        <field name="name">ssc.payslip.list</field>
+        <field name="model">ssc.payslip</field>
+        <field name="arch" type="xml">
+            <list string="Payslips">
+                <field name="name"/>
+                <field name="employee_code"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="total_salary" sum="Total Salary"/>
+                <field name="overtime_salary" sum="Total Overtime"/>
+                <field name="salary_adjustment" sum="Adjustment"/>
+                <field name="net_amount" sum="Net Amount"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'paid'"
+                       decoration-info="state == 'attached'"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ssc_payslip_form" model="ir.ui.view">
+        <field name="name">ssc.payslip.form</field>
+        <field name="model">ssc.payslip</field>
+        <field name="arch" type="xml">
+            <form string="Payslip">
+                <header>
+                    <button name="action_check" type="object" string="Check"
+                            class="btn-primary" invisible="state != 'new'"/>
+                    <button name="action_attach" type="object" string="Attach"
+                            class="btn-primary" invisible="state != 'checked'"/>
+                    <button name="action_set_paid" type="object" string="Set Paid"
+                            invisible="state != 'attached'"
+                            groups="ssc_payroll.group_labour_payroll_manager,ssc_payroll.group_staff_payroll_manager"/>
+                    <button name="action_reset" type="object" string="Reset"
+                            invisible="state == 'new'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="new,checked,attached,paid"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="employee_code"/>
+                            <field name="company_id" options="{'no_create': True}"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="is_staff"/>
+                            <field name="is_cash"/>
+                        </group>
+                        <group>
+                            <field name="batch_id"/>
+                            <field name="attendance_sheet_id" invisible="is_staff"/>
+                            <field name="staff_attendance_id" invisible="not is_staff"/>
+                            <field name="from_date"/>
+                            <field name="to_date"/>
+                            <field name="days"/>
+                            <field name="net_amount"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Contract Details" name="contract">
+                            <group>
+                                <group>
+                                    <field name="designation"/>
+                                    <field name="basic_salary"/>
+                                    <field name="house_allowance"/>
+                                    <field name="transport_allowance"/>
+                                </group>
+                                <group>
+                                    <field name="other_allowance"/>
+                                    <field name="gross_salary"/>
+                                    <field name="rate_per_day"/>
+                                    <field name="ot_rate_regular"/>
+                                    <field name="ot_rate_off"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Salary &amp; Work Entries" name="work">
+                            <group>
+                                <group string="Work Entries">
+                                    <field name="total_attendance"/>
+                                    <field name="overtime_reg"/>
+                                    <field name="overtime_off"/>
+                                </group>
+                                <group string="Amounts">
+                                    <field name="total_salary"/>
+                                    <field name="overtime_salary"/>
+                                    <field name="salary_adjustment"/>
+                                    <field name="net_amount"/>
+                                </group>
+                            </group>
+                            <separator string="Projects"/>
+                            <field name="project_ids">
+                                <list>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="project_id"/>
+                                    <field name="total_attendance" sum="Days"/>
+                                    <field name="salary_amount" sum="Salary"/>
+                                    <field name="total_overtime_reg" sum="OT Reg hrs"/>
+                                    <field name="ot_reg_amount" sum="OT Reg"/>
+                                    <field name="total_overtime_off" sum="OT Off hrs"/>
+                                    <field name="ot_off_amount" sum="OT Off"/>
+                                    <field name="total_overtime_amount"
+                                           sum="Total Overtime"/>
+                                    <field name="total_overtime" optional="hide"/>
+                                    <field name="total_amount" sum="Total"/>
+                                    <field name="share" widget="progressbar"/>
+                                    <field name="allocated_attendance"
+                                           sum="Allocated Days" optional="show"/>
+                                    <field name="allocated_salary_amount" optional="hide"/>
+                                    <field name="allocated_total_amount"
+                                           sum="Allocated Total" optional="show"/>
+                                    <field name="allocated_share" widget="progressbar"
+                                           optional="show"/>
+                                </list>
+                            </field>
+                            <div invisible="not project_ids">
+                                <h4 class="mt-4">Worked Days Only</h4>
+                                <p class="text-muted small">
+                                    Days observed on a daily attendance record.
+                                </p>
+                                <field name="project_chart" nolabel="1" readonly="1"/>
+                                <h4 class="mt-4">Including Advanced Days</h4>
+                                <p class="text-muted small">
+                                    The advanced days attributed to where the
+                                    employee actually was: entirely to one
+                                    project when over 60% of the period was
+                                    spent there, otherwise in the same
+                                    proportions as the worked days.
+                                </p>
+                                <field name="project_chart_allocated" nolabel="1"
+                                       readonly="1"/>
+                            </div>
+                        </page>
+                        <page string="Salary Attachments" name="attachments">
+                            <field name="attachment_ids" context="{'default_employee_id': employee_id}">
+                                <list>
+                                    <field name="type_id"/>
+                                    <field name="name"/>
+                                    <field name="value"/>
+                                    <field name="signed_value"/>
+                                    <field name="state"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Daily Attendance" name="daily_attendance">
+                            <field name="day_ids" readonly="1">
+                                <list string="Daily Attendance" default_order="date"
+                                      decoration-muted="status in ('Absent', 'Off Day')"
+                                      decoration-info="status == 'Sick Leave'">
+                                    <field name="date"/>
+                                    <field name="day_name"/>
+                                    <!-- Raw biometric (BioTime) source -->
+                                    <field name="biotime_status" string="Attendance (BioTime)"/>
+                                    <field name="check_in" string="Check In (BioTime)" widget="datetime"/>
+                                    <field name="check_out" string="Check Out (BioTime)" widget="datetime"/>
+                                    <field name="biotime_overtime" string="Overtime (BioTime)"/>
+                                    <!-- Adjusted source the salary is computed from -->
+                                    <field name="status" string="Attendance (Adjusted)"/>
+                                    <field name="overtime" string="Overtime (Adjusted)"/>
+                                    <field name="project_id" string="Project (Adjusted)"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="auto_note" readonly="1" nolabel="1"
+                                   invisible="not auto_note"/>
+                            <separator/>
+                            <field name="note" placeholder="Notes &amp; Remarks"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ssc_payslip_search" model="ir.ui.view">
+        <field name="name">ssc.payslip.search</field>
+        <field name="model">ssc.payslip</field>
+        <field name="arch" type="xml">
+            <search string="Payslips">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="employee_code"/>
+                <field name="batch_id"/>
+                <filter name="staff" string="Staff" domain="[('is_staff', '=', True)]"/>
+                <filter name="labour" string="Labour" domain="[('is_staff', '=', False)]"/>
+                <filter name="cash" string="Cash" domain="[('is_cash', '=', True)]"/>
+                <separator/>
+                <filter name="new" string="New" domain="[('state', '=', 'new')]"/>
+                <filter name="attached" string="Attached" domain="[('state', '=', 'attached')]"/>
+                <filter name="paid" string="Paid" domain="[('state', '=', 'paid')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_batch" string="Batch" context="{'group_by': 'batch_id'}"/>
+                    <filter name="group_company" string="Company" context="{'group_by': 'company_id'}"/>
+                    <filter name="group_month" string="Month" context="{'group_by': 'month'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_ssc_payslip_graph" model="ir.ui.view">
+        <field name="name">ssc.payslip.graph</field>
+        <field name="model">ssc.payslip</field>
+        <field name="arch" type="xml">
+            <graph string="Payslips" type="bar" sample="1">
+                <field name="month"/>
+                <field name="net_amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_ssc_payslip_pivot" model="ir.ui.view">
+        <field name="name">ssc.payslip.pivot</field>
+        <field name="model">ssc.payslip</field>
+        <field name="arch" type="xml">
+            <pivot string="Payslips" sample="1">
+                <field name="company_id" type="row"/>
+                <field name="month" type="col"/>
+                <field name="net_amount" type="measure"/>
+                <field name="overtime_salary" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_ssc_payslip" model="ir.actions.act_window">
+        <field name="name">Payslips</field>
+        <field name="res_model">ssc.payslip</field>
+        <field name="view_mode">list,form,graph,pivot</field>
+        <field name="search_view_id" ref="view_ssc_payslip_search"/>
+    </record>
+
+</odoo>
