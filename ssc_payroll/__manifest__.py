@@ -3,12 +3,12 @@
     'name': 'SSC Payroll',
     'version': '18.0.1.53.0',
     'summary': 'Construction payroll: employees, attendance, payslips, salary '
-               'batches and employee expenses (native rewrite of the Studio app)',
+               'batches and employee expenses (native rewrite of a legacy custom app)',
     'description': """
 SSC Payroll
 ===========
 Native Odoo 18 payroll module for multi-company construction groups,
-replacing an Odoo Studio customisation.
+replacing a legacy custom app.
 
 Foundation:
     * Company payroll configuration (code, abbreviation, period start day)
@@ -21,12 +21,13 @@ Foundation:
     'author': 'Ibrahim Elzenad',
     'category': 'Human Resources/Payroll',
     'license': 'LGPL-3',
-    # NOTE: we intentionally do NOT depend on ``studio_customization``. On
-    # Odoo.sh it is an auto-generated module that cannot be used as a declared
-    # dependency (the graph reports it as an unmet dependency and the install
-    # never completes). The links to the Studio models ``x_projects_list`` and
-    # ``x_employeeslist`` still resolve, because those custom models live in the
-    # database registry and are available by the time relations are set up.
+    # NOTE: we intentionally do NOT declare a dependency on the database's
+    # auto-generated customisation module. On Odoo.sh it is generated per
+    # database and cannot be used as a declared dependency (the graph reports it
+    # as unmet and the install never completes). The links to the custom models
+    # ``x_projects_list`` and ``x_employeeslist`` still resolve, because those
+    # models live in the database registry and are available by the time
+    # relations are set up.
     'depends': ['base', 'mail', 'hr'],
     'data': [
         'security/ssc_payroll_groups.xml',

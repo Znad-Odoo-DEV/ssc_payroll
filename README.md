@@ -3,9 +3,9 @@
 Native Odoo 18 payroll module for multi-company construction groups: labour and
 staff payroll driven by daily attendance, with per-project cost distribution.
 
-It replaces an Odoo Studio payroll customisation, and still reads the remaining
-Studio models (`x_*`) while the migration is in progress — see
-[Studio bridge](#studio-bridge).
+It replaces a legacy custom payroll app, and still reads the custom models
+(`x_*`) left in the database while the migration is in progress — see
+[Legacy bridge](#legacy-bridge).
 
 ## Features
 
@@ -53,16 +53,17 @@ Studio models (`x_*`) while the migration is in progress — see
   (`Company A`…`Company D`); adapt the selection and `VISA_COMPANY_MAP` in
   `models/ssc_employee.py` to your group.
 
-## Studio bridge
+## Legacy bridge
 
-The module deliberately does **not** depend on `studio_customization`: on
-Odoo.sh that module is generated and cannot be declared as a dependency. The
-links to Studio models (`x_projects_list`, `x_employeeslist`,
-`x_attachments_list`, …) resolve at runtime when those models exist, and are
-skipped when they do not — so the module installs on a database without Studio.
+The module deliberately does **not** declare a dependency on the database's
+auto-generated customisation module: on Odoo.sh it is generated per database
+and the dependency graph never resolves it. The links to the legacy custom
+models (`x_projects_list`, `x_employeeslist`, `x_attachments_list`, …) resolve
+at runtime when those models exist, and are skipped when they do not — so the
+module installs on a plain database.
 
-A scheduled action mirrors Studio salary attachments into `ssc.attachment`
-every 10 minutes; disable it once the Studio side is gone.
+A scheduled action mirrors legacy salary attachments into `ssc.attachment`
+every 10 minutes; disable it once the legacy side is retired.
 
 ## License
 
